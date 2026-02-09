@@ -1,47 +1,69 @@
-import React, { useState, useEffect } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
+import "./App.css";
 
-// PUBLIC_INTERFACE
+import { NavBar } from "./components/NavBar";
+import { RequireAuth } from "./components/RequireAuth";
+
+import HomePage from "./pages/HomePage";
+import AppsListPage from "./pages/AppsListPage";
+import AppDetailPage from "./pages/AppDetailPage";
+import SearchPage from "./pages/SearchPage";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import AdminHomePage from "./pages/AdminHomePage";
+import AdminAppsPage from "./pages/AdminAppsPage";
+import NotFoundPage from "./pages/NotFoundPage";
+
+/** PUBLIC_INTERFACE */
 function App() {
-  const [theme, setTheme] = useState('light');
-
-  // Effect to apply theme to document element
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
-
-  // PUBLIC_INTERFACE
-  const toggleTheme = () => {
-    setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
-  };
-
+  /** Root SPA component (routes + layout). */
   return (
     <div className="App">
-      <header className="App-header">
-        <button 
-          className="theme-toggle" 
-          onClick={toggleTheme}
-          aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-        >
-          {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
-        </button>
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <p>
-          Current theme: <strong>{theme}</strong>
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <NavBar />
+      <main className="main">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+
+          <Route path="/apps" element={<AppsListPage />} />
+          <Route path="/apps/:id" element={<AppDetailPage />} />
+          <Route path="/search" element={<SearchPage />} />
+
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+
+          <Route
+            path="/admin"
+            element={
+              <RequireAuth>
+                <AdminHomePage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/admin/apps"
+            element={
+              <RequireAuth>
+                <AdminAppsPage />
+              </RequireAuth>
+            }
+          />
+
+          <Route path="/home" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </main>
+
+      <footer className="footer">
+        <div className="container">
+          <div className="footer-row">
+            <span>Neon App Arcade · SPA Demo</span>
+            <span style={{ opacity: 0.85 }}>
+              API: {process.env.REACT_APP_API_BASE || process.env.REACT_APP_BACKEND_URL || "(same-origin)"}
+            </span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
